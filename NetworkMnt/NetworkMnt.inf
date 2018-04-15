@@ -1,0 +1,75 @@
+;;;
+;;; Copyright (c) China Merchants Bank. All rights reserved
+;;;
+;;; Abstract:
+;;; network monitor driver install configuration.
+;;;
+
+[Version]
+signature   =   "$Windows NT$"
+Provider 	=   %Channel%
+DriverVer   =   01/26/2016,0.0.0.1
+Class =Network Monitor
+ClassGuid = {0daa4e3f-2c25-4695-9489-0fe63a6cbc39}
+CatalogFile = NetworkMnt.cat            ;Windows assumes that the catalog file is in the same location as the INF file
+
+[DestinationDirs]
+DefaultDestDir = 12
+NetworkMnt.DriverFiles = 12 			;%windir%\system32\drivers
+
+;;
+;; Default install sections
+;;
+
+[DefaultInstall]
+CopyFiles = NetworkMnt.DriverFiles
+OptionDesc = %NetworkMntServiceDesc%
+
+
+[DefaultInstall.Services]
+AddService          = %NetworkMntServiceName%,,NetworkMnt.Service
+
+;;
+;; Default uninstall sections
+;;
+
+[DefaultUninstall]
+DelFiles   = NetworkMnt.DriverFiles
+
+[DefaultUninstall.Services]
+DelService = NetworkMnt,0x200		; Flags note to stop service first
+
+;
+; Services Section
+;
+
+[NetworkMnt.Service]
+DisplayName      = %NetworkMntServiceName%
+Description      = %NetworkMntServiceDesc%
+ServiceBinary    = %12%\NetworkMnt.sys  ;%windir%\system32\drivers\NetworkMnt.sys
+ServiceType      = 1					;SERVICE_KERNEL_DRIVER
+StartType        = 3					;SERVICE_DEMAND_START
+ErrorControl     = 1					;SERVICE_ERROR_NORMAL
+
+;
+; Copy Files
+;
+
+[NetworkMnt.DriverFiles]
+NetworkMnt.sys,,,0x00000040   ; COPYFLG_OVERWRITE_OLDER_ONLY
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+[SourceDisksFiles]
+NetworkMnt.sys = 1,,
+
+;;
+;; String Section
+;;
+
+[Strings]
+Channel = "Proxy channel"
+NetworkMntServiceDesc  = "Network Monitor Driver"
+NetworkMntServiceName  = "NetworkMnt"
+NetworkMntRegistry     = "system\currentcontrolset\services\NetworkMnt"
+DiskId1 = "Disk #1"
